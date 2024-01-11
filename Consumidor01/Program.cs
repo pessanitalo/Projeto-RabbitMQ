@@ -20,16 +20,13 @@ namespace Publicador
             {
                 using (var canal = conexao.CreateModel())
                 {
-
                     canal.QueueDeclare(queue: "fila_de_tarefas",
-                                         durable: true,
-                                         exclusive: false,
-                                         autoDelete: false,
-                                         arguments: null);
+                                       durable: true,
+                                       exclusive: false,
+                                       autoDelete: false,
+                                       arguments: null);
 
                     canal.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
-
-                    Console.WriteLine(" [*] Aguardando mensagens.");
 
                     var consumidor = new EventingBasicConsumer(canal);
 
@@ -39,14 +36,14 @@ namespace Publicador
 
                         var mensagem = Encoding.UTF8.GetString(corpo);
 
-                        Console.WriteLine(" 'Consumidor' Recebido {0}", mensagem);
+                        Console.WriteLine(" [x] Enviou {0} ", mensagem);
 
-                        canal.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                        canal.BasicAck(deliveryTag:ea.DeliveryTag,multiple:false);
+
                     };
 
-                    canal.BasicConsume(queue: "fila_de_tarefas",
-                                         autoAck: false,
-                                         consumer: consumidor);
+                    canal.BasicConsume(queue: "fila_de_tarefas", autoAck: true, consumer: consumidor);
+
                 }
                 Console.WriteLine("precione enter para sair");
                 Console.ReadLine();
