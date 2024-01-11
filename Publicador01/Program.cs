@@ -1,56 +1,51 @@
 ﻿using RabbitMQ.Client;
+
 using System.Text;
 
-namespace Publicador
+var servidor = new ConnectionFactory()
 {
-    internal class Program
+    HostName = "localhost",
+    Port = 5672,
+    UserName = "usuario",
+    Password = "senha@123",
+};
+
+var conexao = servidor.CreateConnection();
+{
+
+    using (var canal = conexao.CreateModel())
     {
-        static void Main(string[] args)
+
+        canal.QueueDeclare(queue: "fila_de_tarefas",
+                      durable: true,
+                      exclusive: false,
+                      autoDelete: false,
+                      arguments: null);
+
+        Console.WriteLine("Digite uma mensagem");
+
+        while (true)
         {
-            var servidor = new ConnectionFactory()
-            {
-                HostName = "localhost",
-                Port = 5672,
-                UserName = "usuario",
-                Password = "senha@123",
-            };
 
-            var conexao = servidor.CreateConnection();
-            {
-                using (var canal = conexao.CreateModel())
-                {
-                    canal.QueueDeclare(queue: "fila_de_tarefas",
-                                       durable: true,
-                                       exclusive: false,
-                                       autoDelete: false,
-                                       arguments: null);
+            string mensagem = Console.ReadLine();
 
-                    Console.WriteLine("'Publicador: ' Digite uma mensagem");
+            if (mensagem == "!finalizar") break;
 
-                    while (true)
-                    {
-                        string mensagem = Console.ReadLine();
+            var corpoMensagem = Encoding.UTF8.GetBytes(mensagem);
 
-                        if (mensagem == "!finalizar") break;
+            var propriedades = canal.CreateBasicProperties();
+            propriedades.Persistent = true;
 
-                        var corpoMensagem = Encoding.UTF8.GetBytes(mensagem);
 
-                        var propriedades = canal.CreateBasicProperties();
-                        propriedades.Persistent = true;
-
-                        canal.BasicPublish(exchange: "",
+            canal.BasicPublish(exchange: "",
                                  routingKey: "fila_de_tarefas",
                                  basicProperties: propriedades,
                                  body: corpoMensagem);
 
-                        Console.WriteLine(" [x] Enviou {0} ", mensagem);
-                    }
-
-
-                }
-                Console.WriteLine("precione enter para sair");
-                Console.ReadLine();
-            }
+            Console.WriteLine(" [x] Enviou {0}", mensagem);
         }
     }
+
+    Console.WriteLine(" Pressione [enter] para sair.");
+    Console.ReadLine();
 }
