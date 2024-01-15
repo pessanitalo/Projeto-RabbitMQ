@@ -1,5 +1,4 @@
 ﻿using RabbitMQ.Client;
-
 using System.Text;
 
 var servidor = new ConnectionFactory()
@@ -26,17 +25,16 @@ var conexao = servidor.CreateConnection();
 
         while (true)
         {
-
+        
             string mensagem = Console.ReadLine();
 
             if (mensagem == "!finalizar") break;
-
+  
             var corpoMensagem = Encoding.UTF8.GetBytes(mensagem);
-
+     
             var propriedades = canal.CreateBasicProperties();
             propriedades.Persistent = true;
-
-
+    
             canal.BasicPublish(exchange: "",
                                  routingKey: "fila_de_tarefas",
                                  basicProperties: propriedades,

@@ -1,9 +1,8 @@
 ﻿using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-
 using System.Text;
 
-//Servidor do Rabbitmq
+
 var servidor = new ConnectionFactory()
 {
     HostName = "localhost",
@@ -12,7 +11,6 @@ var servidor = new ConnectionFactory()
     Password = "senha@123",
 };
 
-//Conexão com o servidor
 var conexao = servidor.CreateConnection();
 {
 
